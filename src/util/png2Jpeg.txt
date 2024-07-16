@@ -1,0 +1,23 @@
+function convertImageToJpeg(file, callback) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = document.createElement('img');
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            canvas.toDataURL('image/jpeg', (dataUrl) => {
+                fetch(dataUrl)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        const jpegFile = new File([blob], 'converted.jpeg', { type: 'image/jpeg' });
+                        callback(jpegFile);
+                    });
+            });
+        };
+        img.src = e.target.result as string;
+    };
+    reader.readAsDataURL(file);
+}
